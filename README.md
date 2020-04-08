@@ -6,6 +6,6 @@ React Native<br >
 
 *********
 
-<img src="https://www.cuby.com.br/cli/tipy/logo.svg" style="height: 100px;">
+<img src="https://www.cuby.com.br/cli/tipy/logo.svg">
 
 This project consists of a web and mobile application for tipping artists.
