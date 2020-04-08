@@ -1,6 +1,8 @@
 import "dotenv/config";
 
 import express from "express";
+import cors from "cors";
+const { errors } = require("celebrate");
 import path from "path";
 import routes from "./routes";
 
@@ -14,6 +16,7 @@ class App {
   }
 
   middlewares() {
+    this.server.use(cors());
     this.server.use(express.json());
     this.server.use(
       "/files",
@@ -23,6 +26,7 @@ class App {
 
   routes() {
     this.server.use(routes);
+    this.server.use(errors());
   }
 }
 

@@ -5,24 +5,16 @@ import User from "../models/User";
 
 class UserController {
   async store(req, res) {
-    const schema = Yup.object().shape({
-      name: Yup.string().required(),
-      email: Yup.string().email().required(),
-      mobile: Yup.string(),
-      performer: Yup.boolean(),
-      password: Yup.string().required().min(3),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: "Verifique os dados digitados" });
-    }
-
     const userExists = await User.findOne({
       where: { email: req.body.email },
     });
     if (userExists) {
-      return res.status(400).json({ error: "Este e-mail já está cadastrado." });
+      return res.status(400).send({ error: "Este e-mail já está cadastrado" });
     }
+
+    const mobile = req.body.mobile.replace(/\D/g, "");
+    req.body.mobile = mobile;
+
     if (req.body.performer) {
       req.body.performer = crypto.randomBytes(4).toString("HEX");
     }
@@ -31,28 +23,11 @@ class UserController {
       id,
       name,
       email,
+      mobile,
     });
   }
 
   async update(req, res) {
-    const schema = Yup.object().shape({
-      name: Yup.string().required(),
-      email: Yup.string().email().required(),
-      mobile: Yup.string(),
-      oldPassword: Yup.string(),
-      password: Yup.string()
-        .min(4)
-        .when("oldPassword", (oldPassword, field) =>
-          oldPassword ? field.required() : field
-        ),
-      confirmPassword: Yup.string().when("password", (password, field) =>
-        password ? field.required().oneOf([Yup.ref("password")]) : field
-      ),
-    });
-
-    if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: "Verifique os dados digitados" });
-    }
     const { email, oldPassword } = req.body;
 
     const user = await User.findByPk(req.userId);
@@ -64,12 +39,12 @@ class UserController {
       if (userExists) {
         return res
           .status(400)
-          .json({ error: "Este e-mail já está cadastrado." });
+          .send({ error: "Este e-mail já está cadastrado" });
       }
     }
 
     if (oldPassword && !(await user.checkPassword(oldPassword))) {
-      return res.status(401).json({ error: "Senha incorreta." });
+      return res.status(401).send({ error: "Senha incorreta" });
     }
 
     const { avatar } = user;
@@ -85,11 +60,19 @@ class UserController {
 
   async index(req, res) {
     if (req.params.id > 0) {
-      const user = await User.findByPk(req.params.id);
+      const user = await User.findByPk(req.params.id, {
+        attributes: [
+          "id",
+          "name",
+          "email",
+          "mobile",
+          "description",
+          "performer",
+          "avatar",
+        ],
+      });
       if (!user) {
-        return res.status(400).json({
-          error: "Usuário não encontrado!",
-        });
+        return res.status(400).send({ error: "Usuário não encontrado" });
       }
       return res.json(user);
     } else {

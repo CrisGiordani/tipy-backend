@@ -7,7 +7,7 @@ export default async (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    return res.status(401).json({ error: "Autenticação não realizada." });
+    return res.send(401, { error: "Permissão negada" });
   }
 
   const [, token] = authHeader.split(" ");
@@ -17,6 +17,6 @@ export default async (req, res, next) => {
     req.userId = decoded.id;
     return next();
   } catch (err) {
-    return res.status(401).json({ error: "Autenticação inválida." });
+    return res.status(401).send({ error: "Autenticação inválida" });
   }
 };

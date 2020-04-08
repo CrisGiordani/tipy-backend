@@ -10,20 +10,23 @@ class SessionController {
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
-      return res.status(401).json({ error: "E-mail não cadastrado." });
+      return res.status(401).send({ error: "E-mail não cadastrado" });
     }
 
     if (!(await user.checkPassword(password))) {
-      return res.status(401).json({ error: "Senha incorreta." });
+      return res.status(401).send({ error: "Senha incorreta" });
     }
 
-    const { id, name, avatar } = user;
+    const { id, name, mobile, description, performer, avatar } = user;
 
     return res.json({
       user: {
         id,
         name,
         email,
+        mobile,
+        description,
+        performer,
         avatar,
       },
       token: jwt.sign({ id }, authConfig.secret, {

@@ -11,9 +11,7 @@ class PerformerController {
         },
       });
       if (!performer) {
-        return res.status(400).json({
-          error: "Artista não encontrado!",
-        });
+        return res.status(400).send({ error: "Artista não encontrado" });
       }
       return res.json(performer);
     } else {

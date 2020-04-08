@@ -8,10 +8,9 @@ class AvatarController {
     user.avatar = path;
     user.save();
 
-    return res.status(200).json({
-      message: "Imagem enviada com sucesso!",
-      avatar: path,
-    });
+    return res
+      .status(200)
+      .send({ error: "Imagem enviada com sucesso!", avatar: path });
   }
 }
 
